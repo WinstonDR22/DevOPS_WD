@@ -1,0 +1,26 @@
+name: Create Azure Resources
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy Azure resources with Bicep
+      run: |
+        az deployment group create \
+          --resource-group ${{ env.AZURE_RG }} \
+          --template-file config/main.bicep \
+          --parameters namePrefix=${{ env.AZURE_PREFIX }}
+    env:
+      AZURE_RG: ${{ secrets.AZURE_RG }}
+      AZURE_PREFIX: ${{ secrets.AZURE_PREFIX }}
